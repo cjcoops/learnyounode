@@ -3,36 +3,63 @@ let bl = require('bl')
 
 let http = require('http')
 
-let urls = process.argv.slice(2,5);
+let net = require('net');
+let server = net.createServer((socket) => {
+  let date = new Date()
+  socket.write(dateToString(date))
+  socket.end()
+})
+server.listen(process.argv[2])
 
-let count = urls.length,
-    results = {};
-
-urls.forEach((url, index) => {
-  httpGet(url, index)
-});
-
-function httpGet(url, index) {
-  http.get(url, (response) => {
-    response.pipe(bl((err, data) => {
-      if (err) return console.error(err);
-
-      results[index] = data.toString()
-
-      count--;
-
-      if (count <= 0) {
-        printResults()
-      }
-    }));
-  });
+function dateToString(date) {
+  let string = ""
+  string += date.getFullYear().toString() + '-'
+          + pad((date.getMonth()+1),2).toString() + '-'
+          + date.getDate().toString() + ' '
+          + date.getHours().toString() + ':'
+          + date.getMinutes().toString() + '\n'
+  return string
 }
 
-function printResults() {
-  for(var i=0; i<3; i++) {
-    console.log(results[i])
-  }
+function pad(n, width, z) {
+  z = z || '0';
+  n = n + '';
+  return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
 }
+
+
+
+// ex9
+// let urls = process.argv.slice(2,5);
+//
+// // let count = urls.length,
+// //     results = {};
+// //
+// // urls.forEach((url, index) => {
+// //   httpGet(url, index)
+// // });
+// //
+// // function httpGet(url, index) {
+// //   http.get(url, (response) => {
+// //     response.pipe(bl((err, data) => {
+// //       if (err) return console.error(err);
+// //
+// //       results[index] = data.toString()
+// //
+// //       count--;
+// //
+// //       if (count <= 0) {
+// //         printResults()
+// //       }
+// //     }));
+// //   });
+// // }
+// //
+// // function printResults() {
+// //   for(var i=0; i<3; i++) {
+// //     console.log(results[i])
+// //   }
+// // }
 
 // for(var i=0; i<urls.length; i++) {
 //   http.get(urls[i], (response) => {
