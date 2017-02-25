@@ -3,14 +3,62 @@ let bl = require('bl')
 
 let http = require('http')
 
-http.get(process.argv[2], (response) => {
-  response.pipe(bl((err, data) => {
-    if (err) return console.error(err);
-    let stringData = data.toString()
-    console.log(stringData.length)
-    console.log(stringData)
-  }))
-})
+let urls = process.argv.slice(2,5);
+
+let count = urls.length,
+    results = {};
+
+urls.forEach((url, index) => {
+  httpGet(url, index)
+});
+
+function httpGet(url, index) {
+  http.get(url, (response) => {
+    response.pipe(bl((err, data) => {
+      if (err) return console.error(err);
+
+      results[index] = data.toString()
+
+      count--;
+
+      if (count <= 0) {
+        printResults()
+      }
+    }));
+  });
+}
+
+function printResults() {
+  for(var i=0; i<3; i++) {
+    console.log(results[i])
+  }
+}
+
+// for(var i=0; i<urls.length; i++) {
+//   http.get(urls[i], (response) => {
+//     response.pipe(bl((err, data) => {
+//       if (err) return console.error(err);
+//       console.log(data.toString())
+//       results[i] = (data.toString())
+//       count --
+//       console.log(results)
+//     }))
+//   });
+// }
+
+
+
+// for(var i=2; i<5; i++) {
+//   let count = 3,
+//       results = {};
+//   http.get(process.argv[i], (response) => {
+//     response.pipe(bl((err, data) => {
+//       if (err) return console.error(err);
+//       console.log(data.toString())
+//     }))
+//   })
+// }
+
 
 // http.get(process.argv[2], (response) => {
 //   response.setEncoding('utf8')
