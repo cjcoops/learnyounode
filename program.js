@@ -4,16 +4,39 @@ let fs = require('fs')
 
 let http = require('http')
 
-let map = require('through2-map')
-
+// let map = require('through2-map')
+let url = require('url')
 
 let server = http.createServer((req, res) => {
-  req.pipe(map(function (chunk) {
-    return chunk.toString().toUpperCase()
-  })).pipe(res)
+  if (req.method=='GET') {
+    res.writeHead(200, {'Content-Type': 'application/json'});
+    let parsedUrl = url.parse(req.url,true);
+    var date = new Date(parsedUrl.query['iso']);
+    if (parsedUrl.pathname == "/api/parsetime") {
+      date = '{"hour":'+ date.getHours() +',"minute":'+ date.getMinutes() +',"second":'+ date.getSeconds() +'}';
+    } else if (parsedUrl.pathname == "/api/unixtime") {
+      console.log(date.toISOString())
+       date = '{"unixtime":'+ Date.parse(date.toISOString()) +'}';
+    }
+    res.end(date)
+  }
 })
 
 server.listen(process.argv[2])
+
+
+
+
+
+
+// ex12
+// let server = http.createServer((req, res) => {
+//   req.pipe(map(function (chunk) {
+//     return chunk.toString().toUpperCase()
+//   })).pipe(res)
+// })
+//
+// server.listen(process.argv[2])
 
 // ex11
 // let server = http.createServer((req, res) => {
