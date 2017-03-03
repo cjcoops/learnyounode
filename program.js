@@ -1,59 +1,78 @@
 let mymodule = require('./mymodule')
 let bl = require('bl')
+let fs = require('fs')
 
 let http = require('http')
 
-let net = require('net');
-let server = net.createServer((socket) => {
-  let date = new Date()
-  socket.write(dateToString(date))
-  socket.end()
+let map = require('through2-map')
+
+
+let server = http.createServer((req, res) => {
+  req.pipe(map(function (chunk) {
+    return chunk.toString().toUpperCase()
+  })).pipe(res)
 })
+
 server.listen(process.argv[2])
 
-function dateToString(date) {
-  let string = ""
-  string += date.getFullYear().toString() + '-'
-          + pad((date.getMonth()+1),2).toString() + '-'
-          + date.getDate().toString() + ' '
-          + date.getHours().toString() + ':'
-          + date.getMinutes().toString() + '\n'
-  return string
-}
+// ex11
+// let server = http.createServer((req, res) => {
+//
+//   fs.createReadStream(process.argv[3]).pipe(res)
+// })
+//
+// server.listen(process.argv[2])
 
-function pad(n, width, z) {
-  z = z || '0';
-  n = n + '';
-  return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
-}
-
-
+// ex10
+// let net = require('net');
+// let server = net.createServer((socket) => {
+//   let date = new Date()
+//   socket.write(dateToString(date))
+//   socket.end()
+// })
+// server.listen(process.argv[2])
+//
+// function dateToString(date) {
+//   let string = ""
+//   string += date.getFullYear().toString() + '-'
+//           + pad((date.getMonth()+1),2).toString() + '-'
+//           + date.getDate().toString() + ' '
+//           + date.getHours().toString() + ':'
+//           + date.getMinutes().toString() + '\n'
+//   return string
+// }
+//
+// function pad(n, width, z) {
+//   z = z || '0';
+//   n = n + '';
+//   return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+// }
 
 // ex9
 // let urls = process.argv.slice(2,5);
 //
-// // let count = urls.length,
-// //     results = {};
-// //
-// // urls.forEach((url, index) => {
-// //   httpGet(url, index)
-// // });
-// //
-// // function httpGet(url, index) {
-// //   http.get(url, (response) => {
-// //     response.pipe(bl((err, data) => {
-// //       if (err) return console.error(err);
-// //
-// //       results[index] = data.toString()
-// //
-// //       count--;
-// //
-// //       if (count <= 0) {
-// //         printResults()
-// //       }
-// //     }));
-// //   });
-// // }
+// let count = urls.length,
+//     results = {};
+//
+// urls.forEach((url, index) => {
+//   httpGet(url, index)
+// });
+//
+// function httpGet(url, index) {
+//   http.get(url, (response) => {
+//     response.pipe(bl((err, data) => {
+//       if (err) return console.error(err);
+//
+//       results[index] = data.toString()
+//
+//       count--;
+//
+//       if (count <= 0) {
+//         printResults()
+//       }
+//     }));
+//   });
+// }
 // //
 // // function printResults() {
 // //   for(var i=0; i<3; i++) {
